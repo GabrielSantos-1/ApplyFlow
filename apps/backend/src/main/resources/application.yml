@@ -1,0 +1,173 @@
+spring:
+  application:
+    name: applyflow-jobcopilot
+  profiles:
+    default: dev
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/applyflow}
+    username: ${DB_USERNAME:applyflow}
+    password: ${DB_PASSWORD:applyflow}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: ${REDIS_TIMEOUT:2s}
+      connect-timeout: ${REDIS_CONNECT_TIMEOUT:2s}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: false
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+  servlet:
+    multipart:
+      max-file-size: ${RESUME_MAX_PDF_BYTES:5242880}
+      max-request-size: ${RESUME_MAX_PDF_BYTES:5242880}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+logging:
+  level:
+    root: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%thread] %logger{36} correlationId=%X{correlationId} %msg%n"
+
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
+
+security:
+  jwt:
+    issuer: ${JWT_ISSUER:applyflow}
+    audience: ${JWT_AUDIENCE:applyflow-web}
+    secret-base64: ${JWT_SECRET_BASE64}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+  rate-limit:
+    redis-enabled: ${RATE_LIMIT_REDIS_ENABLED:true}
+    fallback-enabled: ${RATE_LIMIT_FALLBACK_ENABLED:true}
+    window-seconds: ${RATE_LIMIT_WINDOW_SECONDS:60}
+    redis-key-prefix: ${RATE_LIMIT_REDIS_KEY_PREFIX:applyflow:ratelimit:}
+    simulation-enabled: ${RATE_LIMIT_SIMULATION_ENABLED:false}
+    simulation-mode: ${RATE_LIMIT_SIMULATION_MODE:none}
+    simulated-latency-ms: ${RATE_LIMIT_SIMULATED_LATENCY_MS:0}
+    login-limit: ${RATE_LIMIT_LOGIN_LIMIT:5}
+    refresh-limit: ${RATE_LIMIT_REFRESH_LIMIT:10}
+    resume-upload-limit: ${RATE_LIMIT_RESUME_UPLOAD_LIMIT:6}
+    resume-variant-limit: ${RATE_LIMIT_RESUME_VARIANT_LIMIT:10}
+    application-draft-limit: ${RATE_LIMIT_APPLICATION_DRAFT_LIMIT:12}
+    vacancy-read-limit: ${RATE_LIMIT_VACANCY_READ_LIMIT:90}
+    match-analysis-limit: ${RATE_LIMIT_MATCH_ANALYSIS_LIMIT:60}
+    ai-enrichment-limit: ${RATE_LIMIT_AI_ENRICHMENT_LIMIT:20}
+  headers:
+    mode: ${SECURITY_HEADERS_MODE:dev}
+    hsts-enabled: ${SECURITY_HSTS_ENABLED:false}
+    csp:
+      dev: "${SECURITY_CSP_DEV:default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' http://localhost:3000 http://localhost:8080; frame-ancestors 'none';}"
+      prod: "${SECURITY_CSP_PROD:default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'none';}"
+  actuator:
+    metrics-token: ${ACTUATOR_METRICS_TOKEN:}
+
+ingestion:
+  enabled: ${INGESTION_ENABLED:false}
+  bootstrap:
+    enabled: ${INGESTION_BOOTSTRAP_ENABLED:false}
+    source: ${INGESTION_BOOTSTRAP_SOURCE:REMOTIVE}
+    max-jobs-per-run: ${INGESTION_BOOTSTRAP_MAX_JOBS_PER_RUN:120}
+    only-when-vacancies-empty: ${INGESTION_BOOTSTRAP_ONLY_WHEN_VACANCIES_EMPTY:true}
+    require-no-runs: ${INGESTION_BOOTSTRAP_REQUIRE_NO_RUNS:true}
+    allowed-profiles: ${INGESTION_BOOTSTRAP_ALLOWED_PROFILES:staging,dev}
+  scheduler:
+    enabled: ${INGESTION_SCHEDULER_ENABLED:false}
+    remotive-fixed-delay-ms: ${INGESTION_REMOTIVE_DELAY_MS:1800000}
+    greenhouse-fixed-delay-ms: ${INGESTION_GREENHOUSE_DELAY_MS:3600000}
+    lever-fixed-delay-ms: ${INGESTION_LEVER_DELAY_MS:3600000}
+    adzuna-fixed-delay-ms: ${INGESTION_ADZUNA_DELAY_MS:3600000}
+    job-search-preferences-fixed-delay-ms: ${INGESTION_JOB_SEARCH_PREFERENCES_DELAY_MS:3600000}
+  sources:
+    remotive:
+      enabled: ${INGESTION_REMOTIVE_ENABLED:true}
+      base-url: ${INGESTION_REMOTIVE_BASE_URL:https://remotive.com}
+      jobs-path: ${INGESTION_REMOTIVE_JOBS_PATH:/api/remote-jobs}
+      connect-timeout-ms: ${INGESTION_REMOTIVE_CONNECT_TIMEOUT_MS:2000}
+      read-timeout-ms: ${INGESTION_REMOTIVE_READ_TIMEOUT_MS:5000}
+      max-payload-bytes: ${INGESTION_REMOTIVE_MAX_PAYLOAD_BYTES:1500000}
+      max-jobs-per-run: ${INGESTION_REMOTIVE_MAX_JOBS_PER_RUN:300}
+      allowed-hosts: ${INGESTION_REMOTIVE_ALLOWED_HOSTS:remotive.com}
+    greenhouse:
+      enabled: ${INGESTION_GREENHOUSE_ENABLED:false}
+      base-url: ${INGESTION_GREENHOUSE_BASE_URL:https://boards-api.greenhouse.io}
+      connect-timeout-ms: ${INGESTION_GREENHOUSE_CONNECT_TIMEOUT_MS:2000}
+      read-timeout-ms: ${INGESTION_GREENHOUSE_READ_TIMEOUT_MS:5000}
+      max-payload-bytes: ${INGESTION_GREENHOUSE_MAX_PAYLOAD_BYTES:5000000}
+      max-jobs-per-run: ${INGESTION_GREENHOUSE_MAX_JOBS_PER_RUN:200}
+      allowed-hosts: ${INGESTION_GREENHOUSE_ALLOWED_HOSTS:boards-api.greenhouse.io}
+    lever:
+      enabled: ${INGESTION_LEVER_ENABLED:false}
+      base-url: ${INGESTION_LEVER_BASE_URL:https://api.lever.co}
+      connect-timeout-ms: ${INGESTION_LEVER_CONNECT_TIMEOUT_MS:2000}
+      read-timeout-ms: ${INGESTION_LEVER_READ_TIMEOUT_MS:5000}
+      max-payload-bytes: ${INGESTION_LEVER_MAX_PAYLOAD_BYTES:1500000}
+      max-jobs-per-run: ${INGESTION_LEVER_MAX_JOBS_PER_RUN:200}
+      allowed-hosts: ${INGESTION_LEVER_ALLOWED_HOSTS:api.lever.co}
+    adzuna:
+      enabled: ${INGESTION_ADZUNA_ENABLED:false}
+      base-url: ${INGESTION_ADZUNA_BASE_URL:https://api.adzuna.com}
+      connect-timeout-ms: ${INGESTION_ADZUNA_CONNECT_TIMEOUT_MS:2000}
+      read-timeout-ms: ${INGESTION_ADZUNA_READ_TIMEOUT_MS:5000}
+      max-payload-bytes: ${INGESTION_ADZUNA_MAX_PAYLOAD_BYTES:1500000}
+      max-jobs-per-run: ${INGESTION_ADZUNA_MAX_JOBS_PER_RUN:200}
+      allowed-hosts: ${INGESTION_ADZUNA_ALLOWED_HOSTS:api.adzuna.com}
+      app-id: ${INGESTION_ADZUNA_APP_ID:}
+      app-key: ${INGESTION_ADZUNA_APP_KEY:}
+
+ai:
+  enabled: ${AI_ENABLED:false}
+  provider:
+    name: ${AI_PROVIDER_NAME:openai-compatible}
+    base-url: ${AI_PROVIDER_BASE_URL:https://api.openai.com}
+    chat-path: ${AI_PROVIDER_CHAT_PATH:/v1/chat/completions}
+    model: ${AI_PROVIDER_MODEL:gpt-4o-mini}
+    api-key: ${AI_PROVIDER_API_KEY:}
+    connect-timeout-ms: ${AI_PROVIDER_CONNECT_TIMEOUT_MS:2000}
+    read-timeout-ms: ${AI_PROVIDER_READ_TIMEOUT_MS:8000}
+    max-retries: ${AI_PROVIDER_MAX_RETRIES:1}
+    max-completion-tokens: ${AI_PROVIDER_MAX_COMPLETION_TOKENS:400}
+    temperature: ${AI_PROVIDER_TEMPERATURE:0.2}
+    allowed-hosts: ${AI_PROVIDER_ALLOWED_HOSTS:api.openai.com}
+
+resumes:
+  storage:
+    base-dir: ${RESUME_STORAGE_BASE_DIR:./data/private/resumes}
+    max-pdf-bytes: ${RESUME_MAX_PDF_BYTES:5242880}
+
+bootstrap:
+  admin:
+    enabled: ${BOOTSTRAP_ADMIN_ENABLED:false}
+    email: ${BOOTSTRAP_ADMIN_EMAIL:}
+    password: ${BOOTSTRAP_ADMIN_PASSWORD:}
+    force-password-reset: ${BOOTSTRAP_ADMIN_FORCE_PASSWORD_RESET:false}
+    allowed-profiles: ${BOOTSTRAP_ADMIN_ALLOWED_PROFILES:staging,dev}

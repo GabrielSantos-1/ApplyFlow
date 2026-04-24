@@ -1,0 +1,66 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Node / frontend
+node_modules/
+.next/
+dist/
+build/
+coverage/
+out/
+*.tsbuildinfo
+
+# Java / Maven
+target/
+.m2/
+.mvn-cache/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Certificates / keys
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+
+# Databases / dumps
+*.dump
+*.bak.sql
+*dump*.sql
+*.sqlite
+*.db
+dumps/
+!apps/backend/src/main/resources/db/migration/*.sql
+
+# Temporary local files
+tmp/
+temp/
+tmp_*
+*.tmp
+
+# Local uploads / sensitive storage
+/uploads/
+/storage/
+/private/
+/secrets/
+/credentials/
+data/private/
+
+# Docker/local overrides
+docker-compose.override.yml
+
+# Keep documentation, migrations, source code and .env.example versioned.

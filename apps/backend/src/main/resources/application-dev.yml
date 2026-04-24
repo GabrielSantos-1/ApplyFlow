@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/applyflow}
+    username: ${DB_USERNAME:applyflow}
+    password: ${DB_PASSWORD:applyflow}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: ${REDIS_TIMEOUT:2s}
+      connect-timeout: ${REDIS_CONNECT_TIMEOUT:2s}
+
+security:
+  rate-limit:
+    redis-enabled: ${RATE_LIMIT_REDIS_ENABLED:true}
+    fallback-enabled: ${RATE_LIMIT_FALLBACK_ENABLED:true}
+  headers:
+    mode: ${SECURITY_HEADERS_MODE:dev}
+    hsts-enabled: ${SECURITY_HSTS_ENABLED:false}
+
+ai:
+  enabled: ${AI_ENABLED:false}

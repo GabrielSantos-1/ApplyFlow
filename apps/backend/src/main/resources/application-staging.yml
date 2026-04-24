@@ -1,0 +1,92 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      timeout: ${REDIS_TIMEOUT:2s}
+      connect-timeout: ${REDIS_CONNECT_TIMEOUT:2s}
+
+management:
+  endpoint:
+    health:
+      show-details: never
+
+security:
+  rate-limit:
+    redis-enabled: true
+    fallback-enabled: false
+    simulation-enabled: false
+    simulation-mode: none
+    simulated-latency-ms: 0
+  headers:
+    mode: prod
+    hsts-enabled: true
+  actuator:
+    metrics-token: ${ACTUATOR_METRICS_TOKEN}
+
+ingestion:
+  enabled: ${INGESTION_ENABLED:true}
+  bootstrap:
+    enabled: ${INGESTION_BOOTSTRAP_ENABLED:true}
+    source: ${INGESTION_BOOTSTRAP_SOURCE:REMOTIVE}
+    max-jobs-per-run: ${INGESTION_BOOTSTRAP_MAX_JOBS_PER_RUN:120}
+    only-when-vacancies-empty: ${INGESTION_BOOTSTRAP_ONLY_WHEN_VACANCIES_EMPTY:true}
+    require-no-runs: ${INGESTION_BOOTSTRAP_REQUIRE_NO_RUNS:true}
+    allowed-profiles: ${INGESTION_BOOTSTRAP_ALLOWED_PROFILES:staging}
+  scheduler:
+    enabled: ${INGESTION_SCHEDULER_ENABLED:true}
+    remotive-fixed-delay-ms: ${INGESTION_REMOTIVE_DELAY_MS:1800000}
+    greenhouse-fixed-delay-ms: ${INGESTION_GREENHOUSE_DELAY_MS:3600000}
+    lever-fixed-delay-ms: ${INGESTION_LEVER_DELAY_MS:3600000}
+    adzuna-fixed-delay-ms: ${INGESTION_ADZUNA_DELAY_MS:3600000}
+  sources:
+    remotive:
+      enabled: ${INGESTION_REMOTIVE_ENABLED:true}
+      base-url: ${INGESTION_REMOTIVE_BASE_URL:https://remotive.com}
+      jobs-path: ${INGESTION_REMOTIVE_JOBS_PATH:/api/remote-jobs}
+      connect-timeout-ms: ${INGESTION_REMOTIVE_CONNECT_TIMEOUT_MS:2000}
+      read-timeout-ms: ${INGESTION_REMOTIVE_READ_TIMEOUT_MS:5000}
+      max-payload-bytes: ${INGESTION_REMOTIVE_MAX_PAYLOAD_BYTES:1500000}
+      max-jobs-per-run: ${INGESTION_REMOTIVE_MAX_JOBS_PER_RUN:300}
+      allowed-hosts: ${INGESTION_REMOTIVE_ALLOWED_HOSTS:remotive.com}
+    greenhouse:
+      enabled: ${INGESTION_GREENHOUSE_ENABLED:false}
+      base-url: ${INGESTION_GREENHOUSE_BASE_URL:https://boards-api.greenhouse.io}
+      connect-timeout-ms: ${INGESTION_GREENHOUSE_CONNECT_TIMEOUT_MS:2000}
+      read-timeout-ms: ${INGESTION_GREENHOUSE_READ_TIMEOUT_MS:5000}
+      max-payload-bytes: ${INGESTION_GREENHOUSE_MAX_PAYLOAD_BYTES:5000000}
+      max-jobs-per-run: ${INGESTION_GREENHOUSE_MAX_JOBS_PER_RUN:200}
+      allowed-hosts: ${INGESTION_GREENHOUSE_ALLOWED_HOSTS:boards-api.greenhouse.io}
+    lever:
+      enabled: ${INGESTION_LEVER_ENABLED:false}
+      base-url: ${INGESTION_LEVER_BASE_URL:https://api.lever.co}
+      connect-timeout-ms: ${INGESTION_LEVER_CONNECT_TIMEOUT_MS:2000}
+      read-timeout-ms: ${INGESTION_LEVER_READ_TIMEOUT_MS:5000}
+      max-payload-bytes: ${INGESTION_LEVER_MAX_PAYLOAD_BYTES:1500000}
+      max-jobs-per-run: ${INGESTION_LEVER_MAX_JOBS_PER_RUN:200}
+      allowed-hosts: ${INGESTION_LEVER_ALLOWED_HOSTS:api.lever.co}
+    adzuna:
+      enabled: ${INGESTION_ADZUNA_ENABLED:false}
+      base-url: ${INGESTION_ADZUNA_BASE_URL:https://api.adzuna.com}
+      connect-timeout-ms: ${INGESTION_ADZUNA_CONNECT_TIMEOUT_MS:2000}
+      read-timeout-ms: ${INGESTION_ADZUNA_READ_TIMEOUT_MS:5000}
+      max-payload-bytes: ${INGESTION_ADZUNA_MAX_PAYLOAD_BYTES:1500000}
+      max-jobs-per-run: ${INGESTION_ADZUNA_MAX_JOBS_PER_RUN:200}
+      allowed-hosts: ${INGESTION_ADZUNA_ALLOWED_HOSTS:api.adzuna.com}
+      app-id: ${INGESTION_ADZUNA_APP_ID:}
+      app-key: ${INGESTION_ADZUNA_APP_KEY:}
+
+ai:
+  enabled: ${AI_ENABLED:false}
+
+bootstrap:
+  admin:
+    enabled: ${BOOTSTRAP_ADMIN_ENABLED:false}
+    email: ${BOOTSTRAP_ADMIN_EMAIL:}
+    password: ${BOOTSTRAP_ADMIN_PASSWORD:}
+    force-password-reset: ${BOOTSTRAP_ADMIN_FORCE_PASSWORD_RESET:false}
+    allowed-profiles: ${BOOTSTRAP_ADMIN_ALLOWED_PROFILES:staging}

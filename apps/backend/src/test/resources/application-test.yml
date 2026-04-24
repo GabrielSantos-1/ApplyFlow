@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  flyway:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+security:
+  jwt:
+    issuer: applyflow
+    audience: applyflow-web
+    secret-base64: c3VwZXJzZWNyZXRrZXlzdXBlcnNlY3JldGtleXN1cGVyc2VjcmV0a2V5
+  rate-limit:
+    redis-enabled: false
+    fallback-enabled: true
+    simulation-enabled: false
+    simulation-mode: none
+    simulated-latency-ms: 0
+    window-seconds: 60
+    login-limit: 1000
+    refresh-limit: 1000
+    resume-variant-limit: 1000
+    application-draft-limit: 1000
+    vacancy-read-limit: 1000
+    match-analysis-limit: 1000
+    ai-enrichment-limit: 1000
+  headers:
+    mode: prod
+    hsts-enabled: false
+    csp:
+      dev: "default-src 'self';"
+      prod: "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none';"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+
+ai:
+  enabled: false

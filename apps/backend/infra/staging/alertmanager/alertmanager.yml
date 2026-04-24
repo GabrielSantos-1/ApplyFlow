@@ -1,0 +1,15 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: staging-webhook
+  group_by: ["alertname", "application", "policy"]
+  group_wait: 30s
+  group_interval: 2m
+  repeat_interval: 30m
+
+receivers:
+  - name: staging-webhook
+    webhook_configs:
+      - url: http://host.docker.internal:19093/alerts
+        send_resolved: true

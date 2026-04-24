@@ -1,0 +1,48 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      timeout: ${REDIS_TIMEOUT:1s}
+      connect-timeout: ${REDIS_CONNECT_TIMEOUT:1s}
+
+management:
+  endpoint:
+    health:
+      show-details: never
+
+security:
+  rate-limit:
+    redis-enabled: true
+    fallback-enabled: false
+    simulation-enabled: false
+    simulation-mode: none
+    simulated-latency-ms: 0
+  headers:
+    mode: prod
+    hsts-enabled: true
+  actuator:
+    metrics-token: ${ACTUATOR_METRICS_TOKEN}
+
+ingestion:
+  enabled: ${INGESTION_ENABLED:true}
+  scheduler:
+    enabled: ${INGESTION_SCHEDULER_ENABLED:true}
+    remotive-fixed-delay-ms: ${INGESTION_REMOTIVE_DELAY_MS:1800000}
+  sources:
+    remotive:
+      enabled: ${INGESTION_REMOTIVE_ENABLED:true}
+      base-url: ${INGESTION_REMOTIVE_BASE_URL}
+      jobs-path: ${INGESTION_REMOTIVE_JOBS_PATH:/api/remote-jobs}
+      connect-timeout-ms: ${INGESTION_REMOTIVE_CONNECT_TIMEOUT_MS:1500}
+      read-timeout-ms: ${INGESTION_REMOTIVE_READ_TIMEOUT_MS:4000}
+      max-payload-bytes: ${INGESTION_REMOTIVE_MAX_PAYLOAD_BYTES:1500000}
+      max-jobs-per-run: ${INGESTION_REMOTIVE_MAX_JOBS_PER_RUN:300}
+      allowed-hosts: ${INGESTION_REMOTIVE_ALLOWED_HOSTS}
+
+ai:
+  enabled: ${AI_ENABLED:false}

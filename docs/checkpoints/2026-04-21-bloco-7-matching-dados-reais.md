@@ -1,0 +1,97 @@
+# Checkpoint - 2026-04-21 - Bloco 7 Matching com Dados Reais
+
+## Status
+`concluido com score deterministico, pipeline auditavel, explicabilidade e validacao por testes`
+
+## Gate e diagnostico inicial
+1. Checkpoint do Bloco 6.1 e `PROJECT_STATE` lidos antes da implementacao.
+2. Estado real confirmado:
+   - base operacional e observabilidade ativas;
+   - vagas ingeridas disponiveis (`19`);
+   - sem resumes/profiles reais no ambiente base de validacao local (`0/0`).
+3. Decisao de gate:
+   - apto para iniciar Bloco 7;
+   - risco residual de calibracao com amostra pequena de candidatos registrado.
+
+## Implementacoes principais
+
+### 1) Contratos e DTOs
+- Novo contrato de entrada de matching:
+  - `MatchInput` com:
+    - `vacancyId`
+    - `candidateProfile`
+    - `resumeData`
+- Contrato de resposta consolidado:
+  - `MatchAnalysisResponse` com:
+    - `vacancyId`
+    - `score`
+    - `breakdown`
+    - `strengths`
+    - `gaps`
+    - `recommendation`
+
+### 2) Pipeline de matching (separado por responsabilidade)
+Fluxo implementado em `MatchingUseCaseService`:
+1. carregar vaga
+2. carregar ultimo curriculo do usuario
+3. carregar variante de curriculo para a vaga
+4. carregar perfil do candidato (quando existir)
+5. montar `MatchInput`
+6. extrair features (`MatchingFeatureExtractorService`)
+7. calcular score (`DeterministicMatchScoringService`)
+8. gerar explicacao/recomendacao (`MatchingExplanationService`)
+9. persistir resultado
+10. registrar auditoria e log estruturado
+
+### 3) Formula deterministica de score (0-100)
+- pesos fixos em `MatchingWeightsConfig.defaultV1()`:
+  - stack principal: `35`
+  - senioridade: `15`
+  - localizacao/remoto: `10`
+  - requisitos obrigatorios: `20`
+  - diferenciais: `10`
+  - aderencia textual: `10`
+- cada criterio calculado separadamente;
+- score final por soma ponderada com clamp `[0, 100]`;
+- sem uso de IA para decisao.
+
+### 4) Explicabilidade
+- `strengths` e `gaps` gerados com base no breakdown real;
+- recomendacao padrao:
+  - `APPLY` para score >= 75
+  - `REVIEW` para score >= 50 e < 75
+  - `IGNORE` para score < 50
+
+### 5) Seguranca aplicada no bloco
+- score decidido exclusivamente no backend;
+- sanitizacao de texto externo no extrator (`TextSanitizer`), reduzindo risco de payload malicioso;
+- rate limit dedicado para endpoint de matching (`matches-analyze`);
+- endpoint continua sob autenticacao/autorizacao existentes;
+- logs de decisao sem PII sensivel explicita.
+
+## Evidencias de execucao
+
+### Suite de testes
+Comando executado:
+- `.mvnw.cmd -B test`
+
+Resultado final:
+- `Tests run: 52, Failures: 0, Errors: 0, Skipped: 2`
+- `BUILD SUCCESS`
+
+### Falha encontrada e corrigida durante o bloco
+- Primeira tentativa apos novos testes gerou `3` falhas:
+  - extremos inferiores do score ainda ficavam em `2` por regra de senioridade;
+  - assert de texto de gap sensivel a caixa em teste de explicacao.
+- Correcao aplicada:
+  - ajuste da penalizacao de senioridade para pior caso `0`;
+  - ajuste dos asserts da explicacao.
+- Reexecucao completa validou regressao com sucesso.
+
+## Riscos remanescentes
+1. Calibracao de pesos ainda depende de amostra maior de perfis/curriculos reais para reduzir viés por dominio.
+2. Modelo atual usa tokenizacao simples (sem semantica profunda); adequado para baseline deterministico, mas com limite para equivalencias semanticas.
+3. Persistencia de match ainda nao inclui versionamento de formula/pesos no registro (recomendado para auditoria historica em bloco futuro).
+
+## Proximo passo recomendado
+Bloco 7.1 com calibracao controlada de pesos e avaliacao offline de ranking em dataset real rotulado, mantendo determinismo e sem introduzir IA decisoria.
