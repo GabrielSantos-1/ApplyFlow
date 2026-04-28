@@ -11,12 +11,12 @@
   },
   "dependencies": {
     "next": "^16.2.4",
-    "react": "19.0.0",
+    "react": "19.2.5",
     "react-dom": "19.0.0"
   },
   "devDependencies": {
     "@types/node": "22.10.1",
-    "@types/react": "19.0.2",
+    "@types/react": "19.2.14",
     "@types/react-dom": "19.0.2",
     "autoprefixer": "^10.5.0",
     "postcss": "^8.5.10",
