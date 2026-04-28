@@ -267,3 +267,17 @@
 - **Area:** `operacao/repositorio/seguranca`
 - **Decisao:** antes do primeiro commit/push, criar `.gitignore` raiz abrangente, manter `.env.example` apenas com placeholders e bloquear versionamento de `.env`, temporarios, builds, tokens, dumps e artefatos locais.
 - **Motivo:** o repositorio remoto esta vazio; o commit inicial define a linha de base de seguranca e nao pode carregar credenciais ou artefatos sensiveis.
+
+## DECISION-045 - Smoke runtime E2E como artefato operacional versionado
+- **Data:** `2026-04-28`
+- **Status:** `aceita`
+- **Area:** `operacao/runtime/qualidade`
+- **Decisao:** formalizar smoke E2E do fluxo principal como script versionado em `apps/backend/ops/smoke`, com validacoes de auth, ownership, transicoes de status, tracking e endpoints de schema recente (`job-search-preferences`), mais orquestracao staging separada.
+- **Motivo:** reduzir risco de drift runtime/schema entre codigo e ambiente e criar evidencia repetivel de estabilidade operacional sem alterar contratos de produto.
+
+## DECISION-046 - CI minimo com checks unicos e higiene de repositorio
+- **Data:** `2026-04-28`
+- **Status:** `aceita`
+- **Area:** `ci-cd/repositorio/seguranca`
+- **Decisao:** definir checks obrigatorios `backend-test`, `frontend-quality` e `repository-hygiene`, manter smoke runtime como workflow manual, e configurar Dependabot para Maven, npm e GitHub Actions.
+- **Motivo:** criar baseline rastreavel para branch protection da `main`, reduzir risco de regressao e impedir versionamento acidental de artefatos sensiveis sem depender de secrets reais no CI padrao.

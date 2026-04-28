@@ -50,12 +50,15 @@ dumps/
 tmp/
 temp/
 tmp_*
+*token*.txt
 *.tmp
 
 # Local uploads / sensitive storage
 /uploads/
 /storage/
+storage/
 /private/
+private/
 /secrets/
 /credentials/
 data/private/

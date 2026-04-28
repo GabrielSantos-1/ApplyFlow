@@ -1,0 +1,51 @@
+name: applyflow-runtime-smoke
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-smoke:
+    name: runtime-smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        shell: bash
+        env:
+          JWT_SECRET_BASE64: ${{ secrets.JWT_SECRET_BASE64 }}
+          ACTUATOR_METRICS_TOKEN: ${{ secrets.ACTUATOR_METRICS_TOKEN }}
+          SMOKE_ADMIN_EMAIL: ${{ secrets.SMOKE_ADMIN_EMAIL }}
+          SMOKE_ADMIN_PASSWORD: ${{ secrets.SMOKE_ADMIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${JWT_SECRET_BASE64}" ]]; then
+            echo "::error::Missing required GitHub Actions secret: JWT_SECRET_BASE64"
+            exit 1
+          fi
+          if [[ -z "${ACTUATOR_METRICS_TOKEN}" ]]; then
+            echo "::error::Missing required GitHub Actions secret: ACTUATOR_METRICS_TOKEN"
+            exit 1
+          fi
+          if [[ -z "${SMOKE_ADMIN_EMAIL}" ]]; then
+            echo "::error::Missing required GitHub Actions secret: SMOKE_ADMIN_EMAIL"
+            exit 1
+          fi
+          if [[ -z "${SMOKE_ADMIN_PASSWORD}" ]]; then
+            echo "::error::Missing required GitHub Actions secret: SMOKE_ADMIN_PASSWORD"
+            exit 1
+          fi
+
+      - name: Run staging runtime smoke
+        shell: pwsh
+        env:
+          JWT_SECRET_BASE64: ${{ secrets.JWT_SECRET_BASE64 }}
+          ACTUATOR_METRICS_TOKEN: ${{ secrets.ACTUATOR_METRICS_TOKEN }}
+          SMOKE_ADMIN_EMAIL: ${{ secrets.SMOKE_ADMIN_EMAIL }}
+          SMOKE_ADMIN_PASSWORD: ${{ secrets.SMOKE_ADMIN_PASSWORD }}
+        run: |
+          ./apps/backend/ops/smoke/run-staging-runtime-smoke.ps1

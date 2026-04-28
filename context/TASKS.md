@@ -2,14 +2,45 @@
 
 ## Estado Atual de Execucao
 
-- Em foco: bootstrap seguro de repositorio Git/GitHub apos consolidacao de runtime, UX, ingestao multi-source, painel admin, priorizacao segura e query-driven ingestion.
+- Em foco: CI/CD minimo, protecao de repositorio e prevencao de regressao da `main`.
+- Resultado do bloco (2026-04-28):
+  - [x] criar `.github/workflows/ci.yml`;
+  - [x] criar job `backend-test`;
+  - [x] criar job `frontend-quality`;
+  - [x] criar job `repository-hygiene`;
+  - [x] criar `.github/workflows/runtime-smoke.yml` manual;
+  - [x] criar `.github/dependabot.yml`;
+  - [x] documentar branch protection e secret protection em `docs/operations/repository-protection.md`;
+  - [x] validar backend tests localmente (`76/0/0/2`);
+  - [x] validar frontend lint/typecheck/build localmente;
+  - [x] validar higiene de repositorio localmente;
+  - [ ] validar GitHub Actions remoto apos push/PR;
+  - [ ] configurar branch protection manualmente no GitHub.
+
+## Runtime Validation & Operational Hardening (2026-04-28)
+
+### Concluidas
+  - [x] criar smoke E2E HTTP: `apps/backend/ops/smoke/run-runtime-smoke.ps1`;
+  - [x] criar orchestrator staging: `apps/backend/ops/smoke/run-staging-runtime-smoke.ps1`;
+  - [x] documentar operacao: `docs/operations/runtime-smoke.md`;
+  - [x] remover artefatos sensiveis locais: `tmp_token.txt`, `tmp_token_runtime.txt`;
+  - [x] criar docs obrigatorias ausentes:
+    - [x] `apps/backend/README.md`;
+    - [x] `apps/frontend/README.md`;
+    - [x] `docs/checkpoints/README.md`;
+  - [x] estabilizar gate frontend:
+    - [x] `npm run lint` (via `tsc --noEmit`);
+    - [x] `npm run typecheck`;
+    - [x] `npm run build`;
+  - [x] validar backend tests: `76/0/0/2`;
+  - [x] validar smoke runtime real em staging:
+    - runtime staging posteriormente reportado como `SMOKE_RUNTIME_RESULT=PASS`.
 - Sem mudanca de arquitetura macro; fluxo principal backend e frontend consolidado permanecem compativeis.
 - Prioridade imediata de retomada:
-  1. concluir varredura de segredos antes de `git add`;
-  2. garantir `.gitignore` raiz e `.env.example` sem segredos reais;
-  3. executar backend tests e frontend build;
-  4. criar commit inicial seguro e publicar no GitHub;
-  5. criar endpoint backend batch/agregador para `/vagas` em ciclo posterior.
+  1. fazer push/PR e validar GitHub Actions remoto;
+  2. configurar branch protection da `main` exigindo `backend-test`, `frontend-quality` e `repository-hygiene`;
+  3. ativar secret scanning/push protection no GitHub quando disponivel;
+  4. manter endpoint batch/agregador para `/vagas` em ciclo posterior.
 
 ## Query-Driven Ingestion + Repository Bootstrap (2026-04-24)
 

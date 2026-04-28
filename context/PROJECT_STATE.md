@@ -1,13 +1,13 @@
 # PROJECT_STATE.md
 
-## Snapshot Atualizado - 2026-04-24
+## Snapshot Atualizado - 2026-04-28
 
 | Campo | Valor |
 |---|---|
 | Projeto | `ApplyFlow / Job Copilot` |
-| Data | `2026-04-24` |
-| Fase | `Query-driven ingestion + repository bootstrap` |
-| Status | `Runtime validado, UX consolidada, ingestao multi-source e query-driven ativas, painel admin operacional, priorizacao segura de vagas, preparacao para GitHub com varredura de segredos` |
+| Data | `2026-04-28` |
+| Fase | `CI/CD minimo + repository protection` |
+| Status | `CI minimo criado, Dependabot configurado, workflow manual de smoke runtime criado, gate de higiene de repositorio implementado, validacoes locais passando; execucao remota do GitHub Actions e branch protection ainda pendentes de configuracao no GitHub` |
 
 ## Estado do produto
 - Fluxo principal validado: `vacancy -> match -> draft -> status -> tracking`.
@@ -19,6 +19,10 @@
 - Painel admin de ingestao exposto via `GET /api/v1/admin/ingestion/overview`.
 - `/vagas` prioriza com base em dados do backend.
 - Preferencias de busca por usuario foram implementadas.
+- Diagnostico tecnico de retomada concluido com checkpoint dedicado.
+- Smoke runtime operacional versionado em `apps/backend/ops/smoke`.
+- CI principal versionado em `.github/workflows/ci.yml`.
+- Dependabot versionado em `.github/dependabot.yml`.
 
 ## Query-driven ingestion
 - Modelo: `UserJobSearchPreference`.
@@ -43,12 +47,16 @@
 - Backend:
   - `.\mvnw.cmd -B test -DskipITs`;
   - 76 testes, 0 falhas, 0 erros, 2 skipped.
-- Runtime:
-  - Flyway validou 11 migrations;
-  - preferencias `QA` e `Java Developer` executadas com `SUCCESS`;
-  - dedupe evitou duplicatas, mantendo 222 vagas.
 - Frontend:
-  - ultimo build validado em checkpoint anterior para `/vagas` e `/candidaturas`.
+  - `npm run build` em `apps/frontend`: sucesso;
+  - `npm run lint`: sucesso (`tsc --noEmit`);
+  - `npm run typecheck`: sucesso.
+- Runtime:
+  - script de smoke E2E implementado;
+  - runtime staging reportado como validado com `SMOKE_RUNTIME_RESULT=PASS`.
+- CI/CD:
+  - `backend-test`, `frontend-quality` e `repository-hygiene` criados;
+  - CI remoto ainda nao validado no GitHub.
 
 ## Referencias oficiais
 - `docs/checkpoints/2026-04-24-runtime-validation-flow-consistency.md`
@@ -57,10 +65,13 @@
 - `docs/checkpoints/2026-04-24-painel-operacional-ingestao-admin.md`
 - `docs/checkpoints/2026-04-24-priorizacao-segura-vagas.md`
 - `docs/checkpoints/2026-04-24-query-driven-ingestion-and-repository-bootstrap.md`
+- `docs/checkpoints/2026-04-28-retomada-codex-5-3.md`
+- `docs/checkpoints/2026-04-28-runtime-validation-operational-hardening.md`
+- `docs/checkpoints/2026-04-28-ci-cd-repository-protection.md`
+- `docs/operations/repository-protection.md`
 - `context/CHECKPOINT_TECNICO_ATUAL.md`
 
 ## Proxima retomada segura
-1. Concluir bootstrap Git/GitHub com `.gitignore`, `.env.example`, varredura de segredos, testes e build.
-2. Criar endpoint backend batch/agregador para `/vagas`.
-3. Criar tela admin frontend para o overview de ingestao.
-4. Criar testes de navegador para fluxos principais.
+1. Fazer push/PR e validar GitHub Actions remoto.
+2. Configurar branch protection manual da `main`.
+3. Ativar secret scanning/push protection quando disponivel no GitHub.

@@ -1,12 +1,17 @@
 name: applyflow-ci
 
 on:
-  push:
-    branches: ["main", "develop", "feature/**"]
   pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  backend:
+  backend-test:
+    name: backend-test
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -19,16 +24,17 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: "21"
           cache: maven
 
-      - name: Grant mvnw execute permission
-        run: chmod +x mvnw
+      - name: Grant Maven wrapper execute permission
+        run: chmod +x ./mvnw
 
-      - name: Build backend
-        run: ./mvnw -B -ntp clean verify
+      - name: Run backend tests
+        run: ./mvnw -B test -DskipITs
 
-  frontend:
+  frontend-quality:
+    name: frontend-quality
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -40,12 +46,71 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
           cache: npm
           cache-dependency-path: apps/frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
+      - name: Run lint gate
+        run: npm run lint
+
+      - name: Run typecheck
+        run: npm run typecheck
+
       - name: Build frontend
         run: npm run build
+
+  repository-hygiene:
+    name: repository-hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate repository hygiene
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fail=0
+          while IFS= read -r -d '' file; do
+            base="$(basename "$file")"
+
+            case "$file" in
+              *.env.example|*/.env.example) continue ;;
+              apps/backend/src/main/resources/db/migration/*.sql) continue ;;
+              apps/backend/src/main/java/**/*.java) ;;
+              apps/backend/src/test/java/**/*.java) ;;
+            esac
+
+            if [[ "$file" == apps/backend/src/main/java/**/*.java || "$file" == apps/backend/src/test/java/**/*.java ]]; then
+              if [[ "$base" == ".env" || "$base" == .env.* || "$base" == *secret* || "$base" == *.pem || "$base" == *.key || "$base" == *.p12 || "$base" == *.jks || "$base" == *.dump || "$base" == *.sql ]]; then
+                echo "::error file=$file::Forbidden sensitive filename is versioned"
+                fail=1
+              fi
+              continue
+            fi
+
+            if [[ "$base" == ".env" || "$base" == .env.* || "$base" == *token* || "$base" == *secret* || "$base" == *.pem || "$base" == *.key || "$base" == *.p12 || "$base" == *.jks || "$base" == *.dump || "$base" == *.sql ]]; then
+              echo "::error file=$file::Forbidden sensitive filename is versioned"
+              fail=1
+            fi
+          done < <(git ls-files -z)
+
+          patterns=(
+            "BEGIN PRIVATE"" KEY"
+            "AWS_SECRET""_ACCESS_KEY="
+            "JWT_""SECRET="
+            "DATABASE_URL=postgres""://"
+          )
+
+          for pattern in "${patterns[@]}"; do
+            if git grep -n -I -F "$pattern" -- . ':!*.env.example' ':!apps/backend/src/main/resources/db/migration/*.sql'; then
+              echo "::error::Suspicious secret pattern found: $pattern"
+              fail=1
+            fi
+          done
+
+          exit "$fail"
