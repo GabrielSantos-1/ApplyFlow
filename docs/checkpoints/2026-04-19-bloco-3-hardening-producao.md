@@ -4,43 +4,43 @@
 **concluido com ressalvas**
 
 Motivo da ressalva:
-- A implementa��o t�cnica estava majoritariamente presente, mas a entrega anterior n�o estava totalmente rastre�vel por item (resumo acima da evid�ncia em arquivo). Nesta rodada foi feita auditoria formal com classifica��o por requisito e corre��o pontual do que faltava.
+- A implementação tecnica estava majoritariamente presente, mas a entrega anterior não estava totalmente rastreavel por item (resumo acima da evidencia em arquivo). Nesta rodada foi feita auditoria formal com classificação por requisito e correção pontual do que faltava.
 
-## 2) Auditoria por item (evid�ncia)
+## 2) Auditoria por item (evidincia)
 
-| Item auditado | Status | Evid�ncia principal |
+| Item auditado | Status | Evidincia principal |
 |---|---|---|
 | `RedisRateLimitService` | IMPLEMENTADO | `shared/infrastructure/ratelimit/RedisRateLimitService.java` |
 | `CompositeRateLimitService` | IMPLEMENTADO | `shared/infrastructure/ratelimit/CompositeRateLimitService.java` |
-| fallback expl�cito | IMPLEMENTADO | `CompositeRateLimitService` + `X-RateLimit-Mode` em `RateLimitFilter` |
+| fallback explicito | IMPLEMENTADO | `CompositeRateLimitService` + `X-RateLimit-Mode` em `RateLimitFilter` |
 | chave segura `policy+ip+userId` | IMPLEMENTADO | `RateLimitFilter` |
 | `SecurityConfig` com CSP por ambiente | IMPLEMENTADO | `shared/infrastructure/security/SecurityConfig.java` |
 | `SecurityProperties` | IMPLEMENTADO | `shared/infrastructure/security/SecurityProperties.java` |
-| `TextSanitizer` refor�ado | IMPLEMENTADO | `shared/application/security/TextSanitizer.java` |
+| `TextSanitizer` reforado | IMPLEMENTADO | `shared/application/security/TextSanitizer.java` |
 | `GlobalExceptionHandler` endurecido | IMPLEMENTADO | `shared/interfaces/http/GlobalExceptionHandler.java` |
 | DTOs validados | IMPLEMENTADO | DTOs em `applications/resumes/vacancies/.../request` |
 | testes auth/authorization/ownership | IMPLEMENTADO | `SecurityAuthorizationIntegrationTest.java` |
 | testes rate limit (429) | IMPLEMENTADO | `RateLimitIntegrationTest.java` |
-| teste Redis indispon�vel | IMPLEMENTADO (corrigido nesta rodada) | `RateLimitRedisUnavailableIntegrationTest.java` |
+| teste Redis indisponivel | IMPLEMENTADO (corrigido nesta rodada) | `RateLimitRedisUnavailableIntegrationTest.java` |
 | testes de headers | IMPLEMENTADO | `SecurityHeadersIntegrationTest.java` |
 | Maven Wrapper | IMPLEMENTADO | `apps/backend/mvnw`, `mvnw.cmd`, `.mvn/wrapper/*` |
 | workflow CI | IMPLEMENTADO | `.github/workflows/ci.yml` |
 | docs/checkpoint/context | IMPLEMENTADO | `docs/*` + `context/*` |
 
-## 3) Inconsist�ncia assumida explicitamente
-A execu��o anterior misturou, no resumo final, mudan�as funcionais de hardening com altera��es incidentais de encoding/normaliza��o, sem separar claramente evid�ncia por requisito. Isso gerou percep��o de baixa rastreabilidade. Nesta rodada a rastreabilidade foi reestruturada por item e arquivo.
+## 3) Inconsistencia assumida explicitamente
+A execução anterior misturou, no resumo final, mudanças funcionais de hardening com alteraçoes incidentais de encoding/normalização, sem separar claramente evidencia por requisito. Isso gerou percepção de baixa rastreabilidade. Nesta rodada a rastreabilidade foi reestruturada por item e arquivo.
 
 ## 4) O que foi corrigido nesta rodada
 
-### J� existia
+### Já existia
 - Redis + fallback em arquitetura de rate limit.
 - CSP/headers centralizados.
-- Sanitiza��o refor�ada e valida��es principais.
-- Testes centrais de seguran�a.
+- Sanitizaçãoo reforada e validações principais.
+- Testes centrais de segurança.
 
 ### Estava incompleto
-- N�o havia teste HTTP expl�cito para indisponibilidade do backend de rate limit (`503`).
-- Faltava trilha de auditoria expl�cita para evento de indisponibilidade de rate limit.
+- Não havia teste HTTP explicito para indisponibilidade do backend de rate limit (`503`).
+- Faltava trilha de auditoria explicita para evento de indisponibilidade de rate limit.
 - CI continha fallback inline de segredo.
 
 ### Ajustado agora
@@ -48,7 +48,7 @@ A execu��o anterior misturou, no resumo final, mudan�as funcionais de hard
 - `RateLimitFilter` passou a registrar auditoria de indisponibilidade e expor `X-RateLimit-Mode=unavailable`.
 - Workflow CI ajustado para remover fallback hardcoded de segredo.
 
-## 5) Testes executados (evid�ncia de comando)
+## 5) Testes executados (evidencia de comando)
 
 ### Backend
 Comando executado:
@@ -66,16 +66,16 @@ Comando executado:
 npm run build
 ```
 Resultado:
-- Build conclu�do com sucesso (Next.js 16.2.4)
+- Build concluido com sucesso (Next.js 16.2.4)
 
-## 6) O que ainda n�o est� pronto para produ��o
-1. Fallback in-memory (quando habilitado) n�o oferece consist�ncia global entre inst�ncias.
-2. Falta camada completa de m�tricas/alertas operacionais de seguran�a.
-3. CSP pode requerer ajuste fino conforme novas integra��es de frontend.
+## 6) O que ainda não estão pronto para produção
+1. Fallback in-memory (quando habilitado) não oferece consistencia global entre instancias.
+2. Falta camada completa de métricas/alertas operacionais de segurança.
+3. CSP pode requerer ajuste fino conforme novas integrações de frontend.
 
 ## 7) SYSTEM_CONTEXT_UPDATE
 - Estado atual real: Bloco 3 fechado tecnicamente com hardening validado por testes e build.
-- M�dulos funcionais: `auth`, `vacancies`, `resumes`, `applications`, `matching`, `shared`.
-- Decis�es travadas: Redis principal para rate-limit, fallback expl�cito, headers/CSP centralizados, sanitiza��o compartilhada, wrapper obrigat�rio.
-- Limita��es atuais: fallback local em indisponibilidade Redis, observabilidade ainda parcial.
-- Pr�ximos passos: m�tricas/alertas, valida��o multi-inst�ncia com Redis real, refino de CSP por uso real.
+- Modulos funcionais: `auth`, `vacancies`, `resumes`, `applications`, `matching`, `shared`.
+- Decisoes travadas: Redis principal para rate-limit, fallback explicito, headers/CSP centralizados, sanitização compartilhada, wrapper obrigatario.
+- Limitações atuais: fallback local em indisponibilidade Redis, observabilidade ainda parcial.
+- Proximos passos: metricas/alertas, validação multi-instancia com Redis real, refino de CSP por uso real.
