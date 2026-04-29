@@ -94,7 +94,7 @@
   - `security.actuator.metrics-token` ausente
 - **Motivo:** evitar operacao com configuracao insegura e falsa sensacao de resiliencia distribuida.
 
-## DECISION-021 - Validação de carga de staging fora da suite default
+## DECISION-021 - ValidaÃ§Ã£o de carga de staging fora da suite default
 - **Data:** `2026-04-20`
 - **Status:** `aceita`
 - **Area:** `qualidade/operacao`
@@ -244,7 +244,7 @@
   - separar leitura e geracao de match:
     - `POST /api/v1/matches` para gerar/regerar;
     - `GET /api/v1/matches/vacancy/{vacancyId}` para leitura stateful;
-  - leitura por vaga retorna estado de dominio (`GENERATED`, `MISSING_RESUME`, `MISSING_VARIANT`, `NOT_GENERATED`) em vez de tratar ausencia de contexto como falha catastrófica.
+  - leitura por vaga retorna estado de dominio (`GENERATED`, `MISSING_RESUME`, `MISSING_VARIANT`, `NOT_GENERATED`) em vez de tratar ausencia de contexto como falha catastrÃ³fica.
 - **Motivo:** remover ambiguidade operacional dos `404` em massa no frontend, preservar auditabilidade do score deterministico e manter ownership por usuario sem vazar match de terceiros.
 
 ## DECISION-042 - Ingestao query-driven por preferencias controladas
@@ -281,3 +281,10 @@
 - **Area:** `ci-cd/repositorio/seguranca`
 - **Decisao:** definir checks obrigatorios `backend-test`, `frontend-quality` e `repository-hygiene`, manter smoke runtime como workflow manual, e configurar Dependabot para Maven, npm e GitHub Actions.
 - **Motivo:** criar baseline rastreavel para branch protection da `main`, reduzir risco de regressao e impedir versionamento acidental de artefatos sensiveis sem depender de secrets reais no CI padrao.
+
+## DECISION-047 - Preparacao publica exige documentacao e politica de seguranca sem definir licenca automaticamente
+- **Data:** `2026-04-29`
+- **Status:** `aceita`
+- **Area:** `repositorio/publicacao/seguranca`
+- **Decisao:** preparar README publico, SECURITY.md, CONTRIBUTING.md, exemplos de ambiente e documentacao de estrutura sem escolher LICENSE automaticamente.
+- **Motivo:** melhorar clareza e seguranca operacional para exposicao publica sem assumir permissao de reutilizacao. A decisao de licenca permanece pendente e deve ocorrer antes de tornar o repositorio publico.

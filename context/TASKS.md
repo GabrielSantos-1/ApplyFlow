@@ -2,8 +2,24 @@
 
 ## Estado Atual de Execucao
 
-- Em foco: CI/CD minimo, protecao de repositorio e prevencao de regressao da `main`.
-- Resultado do bloco (2026-04-28):
+- Em foco: public release hardening e portfolio polish para possivel exposicao publica.
+- Resultado do bloco (2026-04-29):
+  - [x] reescrever README raiz com apresentacao publica do ApplyFlow;
+  - [x] criar `SECURITY.md`;
+  - [x] padronizar `.env.example` raiz e `apps/backend/.env.example`;
+  - [x] criar `apps/frontend/.env.example`;
+  - [x] criar `docs/architecture/repository-structure.md`;
+  - [x] criar `CONTRIBUTING.md`;
+  - [x] registrar que LICENSE ainda nao foi decidido;
+  - [x] reexecutar scanner final de secrets;
+  - [x] reexecutar backend tests;
+  - [x] reexecutar frontend lint/typecheck/build;
+  - [ ] validar GitHub Actions remoto apos push/PR;
+  - [ ] configurar branch protection manualmente no GitHub;
+  - [ ] ativar secret scanning/push protection quando disponivel;
+  - [ ] decidir LICENSE antes de tornar publico.
+
+## CI/CD & Repository Protection (2026-04-28)- Resultado do bloco (2026-04-28):
   - [x] criar `.github/workflows/ci.yml`;
   - [x] criar job `backend-test`;
   - [x] criar job `frontend-quality`;

@@ -1,13 +1,13 @@
-# Checkpoint Tecnico - CI/CD & Repository Protection
-Data: 2026-04-28
+# Checkpoint Tecnico - Public Release Hardening & Portfolio Polish
+Data: 2026-04-29
 
 ## Versao atual do sistema
-O ApplyFlow permanece no estado consolidado pos-runtime validation, UX de candidatura, sessao frontend segura, ingestao multi-source, painel admin operacional, priorizacao segura de vagas e ingestao query-driven por preferencias do usuario.
+O ApplyFlow permanece no estado consolidado pos-runtime validation, UX de candidatura, sessao frontend segura, ingestao multi-source, painel admin operacional, priorizacao segura de vagas, ingestao query-driven por preferencias do usuario, CI/CD minimo e repository hygiene.
 
-Nesta data foi executado bloco de CI/CD minimo, protecao de repositorio e prevencao de regressao, sem novas features e sem mudanca arquitetural.
+Nesta data foi executado bloco de public release hardening e portfolio polish, sem novas features, sem mudanca de DTO, sem regra de negocio nova e sem alteracao arquitetural.
 
 Referencia oficial desta versao:
-- `docs/checkpoints/2026-04-28-ci-cd-repository-protection.md`
+- `docs/checkpoints/2026-04-29-public-release-hardening-portfolio-polish.md`
 
 ## Fluxo principal consolidado
 ```text
@@ -23,37 +23,35 @@ vacancy -> match -> draft -> status -> tracking
 - Rate limit segue aplicado a fluxos sensiveis.
 - Painel admin de ingestao esta operacional.
 - `/vagas` prioriza oportunidades sem recalcular score no frontend.
+- Smoke runtime e CI/CD minimo seguem versionados.
 
-## Query-driven ingestion
-Foi criado suporte a pesquisas controladas por usuario em `UserJobSearchPreference`.
-
-Endpoints:
-- `GET /api/v1/job-search-preferences`
-- `POST /api/v1/job-search-preferences`
-- `PATCH /api/v1/job-search-preferences/{id}`
-
-Providers:
-- `REMOTIVE`: busca por keyword.
-- `ADZUNA`: busca por keyword/location quando credenciais existirem.
-- `GREENHOUSE`: mantido como board-curated.
+## Public release hardening
+- README raiz reescrito em ingles para apresentacao publica do ApplyFlow.
+- `SECURITY.md` criado com politica de reporte e regras de secrets.
+- `CONTRIBUTING.md` criado com fluxo basico de contribuicao e validacao.
+- `.env.example` raiz reduzido a ponteiro seguro.
+- `apps/backend/.env.example` padronizado sem valores sensiveis reais.
+- `apps/frontend/.env.example` criado.
+- `docs/architecture/repository-structure.md` criado.
+- LICENSE nao definido por falta de decisao explicita.
 
 ## Seguranca aplicada
 - Ownership por `userId`.
+- RBAC `USER`/`ADMIN`.
 - Provider allowlist.
 - Normalizacao Unicode e bloqueio de caracteres de controle.
 - Limite de preferencias por usuario.
-- Rate limit em leitura/escrita.
-- Sem URL arbitraria do usuario.
-- Logs com hash de keyword.
+- Rate limit em fluxos sensiveis.
+- Storage privado para curriculos.
+- Validacao de PDF por assinatura e limite de tamanho.
+- Logs sem token/payload bruto intencional.
 - Dedupe/qualityScore preservados no pipeline existente.
-- Outro usuario nao acessa preferencia alheia.
+- Repository hygiene gate versionado.
 
 ## Evidencias recentes
 - Backend tests (2026-04-28):
   - `.\mvnw.cmd -B test -DskipITs`;
   - 76 testes, 0 falhas, 0 erros, 2 skipped.
-- Frontend build (2026-04-28):
-  - `npm run build` em `apps/frontend` -> sucesso com TypeScript.
 - Frontend quality gate (2026-04-28):
   - `npm run lint` -> OK (`tsc --noEmit`);
   - `npm run typecheck` -> OK;
@@ -64,16 +62,21 @@ Providers:
 - CI/CD (2026-04-28):
   - `.github/workflows/ci.yml` criado com `backend-test`, `frontend-quality`, `repository-hygiene`;
   - `.github/workflows/runtime-smoke.yml` criado como workflow manual;
-  - `.github/dependabot.yml` criado;
-  - documentacao de branch protection e secret protection criada.
+  - `.github/dependabot.yml` criado.
 
 ## Limitacoes conhecidas
 - Adzuna depende de credenciais externas.
 - Greenhouse nao suporta busca global no conector atual.
-- Aumento real de volume depende de resultados novos nas APIs externas.
-- Repositorio Git/GitHub deve ser inicializado com varredura de segredos e `.gitignore` abrangente.
+- ESLint semantico ainda nao foi reintroduzido; `npm run lint` e gate minimo com `tsc --noEmit`.
+- Runtime smoke manual exige secrets configurados.
+- GitHub Actions remoto ainda precisa ser validado apos push/PR.
+- Branch protection depende de configuracao manual no GitHub.
+- Secret scanning/push protection depende de disponibilidade/configuracao do GitHub.
+- LICENSE ainda nao definido; repositorio nao deve ser tornado publico antes dessa decisao.
 
 ## Proxima retomada segura
-1. Fazer push/PR e validar GitHub Actions remoto.
-2. Configurar branch protection manualmente para `main` exigindo `backend-test`, `frontend-quality` e `repository-hygiene`.
-3. Ativar secret scanning/push protection no GitHub quando disponivel.
+1. Reexecutar validacoes finais deste bloco e revisar scanner de secrets.
+2. Fazer push/PR e validar GitHub Actions remoto.
+3. Configurar branch protection manualmente para `main` exigindo `backend-test`, `frontend-quality` e `repository-hygiene`.
+4. Ativar secret scanning/push protection no GitHub quando disponivel.
+5. Decidir LICENSE antes de tornar o repositorio publico.

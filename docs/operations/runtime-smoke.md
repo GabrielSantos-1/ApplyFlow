@@ -23,8 +23,8 @@ Validacao operacional automatizada do fluxo principal:
 ## Execucao recomendada
 
 ```powershell
-$env:JWT_SECRET_BASE64="BASE64_32BYTES_OR_MORE"
-$env:ACTUATOR_METRICS_TOKEN="token-metrics-local"
+$env:JWT_SECRET_BASE64="<base64-32-bytes-or-more>"
+$env:ACTUATOR_METRICS_TOKEN="<metrics-token-local>"
 $env:SMOKE_ADMIN_EMAIL="smoke-admin@applyflow.local"
 $env:SMOKE_ADMIN_PASSWORD="<senha-local-nao-versionada>"
 powershell -ExecutionPolicy Bypass -File apps/backend/ops/smoke/run-staging-runtime-smoke.ps1
