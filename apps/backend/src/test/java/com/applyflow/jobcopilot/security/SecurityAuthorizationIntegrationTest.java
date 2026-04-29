@@ -2,6 +2,7 @@ package com.applyflow.jobcopilot.security;
 
 import com.applyflow.jobcopilot.auth.infrastructure.persistence.entity.UserJpaEntity;
 import com.applyflow.jobcopilot.auth.infrastructure.persistence.repository.UserJpaRepository;
+import com.applyflow.jobcopilot.shared.infrastructure.security.RefreshTokenCsrfProtectionFilter;
 import com.applyflow.jobcopilot.vacancies.domain.VacancyStatus;
 import com.applyflow.jobcopilot.vacancies.infrastructure.persistence.entity.VacancyJpaEntity;
 import com.applyflow.jobcopilot.vacancies.infrastructure.persistence.repository.VacancyJpaRepository;
@@ -381,6 +382,7 @@ class SecurityAuthorizationIntegrationTest {
         LoginSession login = login(email);
 
         String firstRefreshResponse = mockMvc.perform(post("/api/v1/auth/refresh")
+                        .header(RefreshTokenCsrfProtectionFilter.CSRF_HEADER, "1")
                         .cookie(new jakarta.servlet.http.Cookie("refresh_token", login.refreshToken)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getHeader("Set-Cookie");
@@ -388,13 +390,81 @@ class SecurityAuthorizationIntegrationTest {
         String rotatedRefresh = extractRefreshToken(firstRefreshResponse);
 
         mockMvc.perform(post("/api/v1/auth/refresh")
+                        .header(RefreshTokenCsrfProtectionFilter.CSRF_HEADER, "1")
                         .cookie(new jakarta.servlet.http.Cookie("refresh_token", login.refreshToken)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.errorCode").value("FORBIDDEN"));
 
         mockMvc.perform(post("/api/v1/auth/refresh")
+                        .header(RefreshTokenCsrfProtectionFilter.CSRF_HEADER, "1")
                         .cookie(new jakarta.servlet.http.Cookie("refresh_token", rotatedRefresh)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void refreshWithCookieWithoutCsrfHeaderMustFail() throws Exception {
+        String email = "csrf-refresh-missing@test.local";
+        seedUser(email, "Password123!", "USER");
+        LoginSession login = login(email);
+
+        mockMvc.perform(post("/api/v1/auth/refresh")
+                        .cookie(new jakarta.servlet.http.Cookie("refresh_token", login.refreshToken)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.errorCode").value("FORBIDDEN"));
+    }
+
+    @Test
+    void refreshWithCookieAndCsrfHeaderMustPass() throws Exception {
+        String email = "csrf-refresh-present@test.local";
+        seedUser(email, "Password123!", "USER");
+        LoginSession login = login(email);
+
+        mockMvc.perform(post("/api/v1/auth/refresh")
+                        .header(RefreshTokenCsrfProtectionFilter.CSRF_HEADER, "1")
+                        .cookie(new jakarta.servlet.http.Cookie("refresh_token", login.refreshToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").isString())
+                .andExpect(jsonPath("$.refreshToken").isEmpty());
+    }
+
+    @Test
+    void logoutWithCookieWithoutCsrfHeaderMustFail() throws Exception {
+        String email = "csrf-logout-missing@test.local";
+        seedUser(email, "Password123!", "USER");
+        LoginSession login = login(email);
+
+        mockMvc.perform(post("/api/v1/auth/logout")
+                        .header("Authorization", bearer(login.accessToken))
+                        .cookie(new jakarta.servlet.http.Cookie("refresh_token", login.refreshToken)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.errorCode").value("FORBIDDEN"));
+    }
+
+    @Test
+    void logoutWithCookieAndCsrfHeaderMustPass() throws Exception {
+        String email = "csrf-logout-present@test.local";
+        seedUser(email, "Password123!", "USER");
+        LoginSession login = login(email);
+
+        mockMvc.perform(post("/api/v1/auth/logout")
+                        .header("Authorization", bearer(login.accessToken))
+                        .header(RefreshTokenCsrfProtectionFilter.CSRF_HEADER, "1")
+                        .cookie(new jakarta.servlet.http.Cookie("refresh_token", login.refreshToken)))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void loginMustNotRequireCsrfHeader() throws Exception {
+        seedUser("csrf-login@test.local", "Password123!", "USER");
+
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{" +
+                                "\"email\":\"csrf-login@test.local\"," +
+                                "\"password\":\"Password123!\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").isString())
+                .andExpect(jsonPath("$.refreshToken").isEmpty());
     }
 
     private UUID createResume(String accessToken, String title, String sourceFileName) throws Exception {

@@ -2,7 +2,37 @@
 
 ## Estado Atual de Execucao
 
-- Em foco: correcao final do README, LICENSE MIT e hardening final antes de publicacao.
+- Em foco: Admin Dashboard UX e overview operacional de ingestao.
+- Resultado do bloco Admin Dashboard UX (2026-04-29):
+  - [x] criar rota frontend `/admin`;
+  - [x] criar client API para `GET /api/v1/admin/ingestion/overview`;
+  - [x] adicionar tipos TypeScript do overview;
+  - [x] exibir cards de métricas operacionais;
+  - [x] exibir saúde dos providers;
+  - [x] exibir qualidade/dedupe;
+  - [x] exibir últimas execuções;
+  - [x] tratar loading/empty/error/401/403 com mensagens seguras;
+  - [x] preservar backend, DTO backend, RBAC, ingestão e matching;
+  - [ ] capturar screenshot `docs/assets/applyflow-admin-dashboard.png` com dados sintéticos;
+  - [ ] validar visualmente `/admin` em navegador desktop/mobile;
+  - [x] executar validação final frontend neste bloco.
+
+## UI Refactor Dashboard & Vagas (2026-04-29)
+
+- Resultado do bloco UI (2026-04-29):
+  - [x] centralizar layout da tela `/vagas`;
+  - [x] criar header visual organizado;
+  - [x] reorganizar busca e filtros;
+  - [x] encapsular lista em container claro;
+  - [x] refinar cards de vaga sem alterar acoes;
+  - [x] preservar links externos com `rel="noopener noreferrer"`;
+  - [x] preparar `docs/assets/` para screenshot;
+  - [ ] capturar screenshot `docs/assets/applyflow-vagas.png` com dados sinteticos;
+  - [ ] validar visualmente em navegador desktop/mobile;
+  - [x] executar validacao final frontend neste bloco.
+
+## Public Release Hardening (2026-04-29)
+
 - Resultado do bloco (2026-04-29):
   - [x] reescrever README raiz com apresentacao publica do ApplyFlow;
   - [x] criar `SECURITY.md`;
@@ -528,3 +558,17 @@
 - [x] Confirmar em `information_schema.columns` presenca das colunas novas em `resumes`.
 - [x] Revalidar `POST /api/v1/resumes` com multipart PDF autenticado retornando `201`.
 - [x] Confirmar persistencia de metadados e arquivo em storage privado.
+
+## CSRF Security Review (2026-04-29)
+
+- [x] Confirmar que refresh token e transportado por cookie HttpOnly.
+- [x] Avaliar risco CSRF em `POST /api/v1/auth/refresh` e `POST /api/v1/auth/logout`.
+- [x] Preservar login sem exigencia de CSRF.
+- [x] Remover padrao `csrf(AbstractHttpConfigurer::disable)` de `SecurityConfig`.
+- [x] Adicionar gate `X-ApplyFlow-CSRF: 1` para refresh/logout cookie-backed.
+- [x] Permitir header em CORS.
+- [x] Ajustar frontend para enviar header sem persistir tokens.
+- [x] Adicionar testes de refresh/logout com e sem header.
+- [x] Executar backend tests (`81/0/0/2`).
+- [x] Executar frontend build.
+- [ ] Validar CodeQL remoto apos push/PR.

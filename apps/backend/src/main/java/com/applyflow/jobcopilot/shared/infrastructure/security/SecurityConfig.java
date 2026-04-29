@@ -9,7 +9,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -27,10 +26,11 @@ public class SecurityConfig {
                                                    RateLimitFilter rateLimitFilter,
                                                    JwtAuthenticationFilter jwtAuthenticationFilter,
                                                    ActuatorTokenAuthenticationFilter actuatorTokenAuthenticationFilter,
+                                                   RefreshTokenCsrfProtectionFilter refreshTokenCsrfProtectionFilter,
                                                    RestAuthenticationEntryPoint authEntryPoint,
                                                    RestAccessDeniedHandler accessDeniedHandler) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/**"))
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> {
@@ -58,6 +58,7 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(correlationIdFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(rateLimitFilter, CorrelationIdFilter.class)
+                .addFilterAfter(refreshTokenCsrfProtectionFilter, RateLimitFilter.class)
                 .addFilterAfter(jwtAuthenticationFilter, CorrelationIdFilter.class)
                 .addFilterAfter(actuatorTokenAuthenticationFilter, JwtAuthenticationFilter.class);
         return http.build();

@@ -6,8 +6,8 @@
 |---|---|
 | Projeto | `ApplyFlow / Job Copilot` |
 | Data | `2026-04-29` |
-| Fase | `README + LICENSE public readiness fix` |
-| Status | `README publico, SECURITY.md, CONTRIBUTING.md, env examples e estrutura do repositorio documentados; backend tests e frontend lint/typecheck/build passando; GitHub Actions remoto, branch protection e secret scanning ainda pendentes antes de abertura publica; LICENSE MIT definido` |
+| Fase | `Admin dashboard UX operacional` |
+| Status | `README publico, SECURITY.md, CONTRIBUTING.md, env examples e estrutura do repositorio documentados; backend tests e frontend lint/typecheck/build passando; dashboard admin operacional criado no frontend; validacao final frontend passando; protecoes publicas ja consolidadas em blocos anteriores` |
 
 ## Estado do produto
 - Fluxo principal validado: `vacancy -> match -> draft -> status -> tracking`.
@@ -29,6 +29,8 @@
 - `.env.example` raiz, backend e frontend padronizados sem secrets reais.
 - Estrutura do repositorio documentada em `docs/architecture/repository-structure.md`.
 - `LICENSE` MIT criado.
+- Tela `/vagas` refatorada visualmente com container central, header, filtros organizados e cards refinados.
+- Rota `/admin` criada para overview operacional de ingestão usando endpoint backend existente.
 
 ## Query-driven ingestion
 - Modelo: `UserJobSearchPreference`.
@@ -81,13 +83,26 @@
 - `docs/checkpoints/2026-04-28-ci-cd-repository-protection.md`
 - `docs/checkpoints/2026-04-29-public-release-hardening-portfolio-polish.md`
 - `docs/checkpoints/2026-04-29-readme-license-public-readiness-fix.md`
+- `docs/checkpoints/2026-04-29-ui-refactor-dashboard-vagas.md`
+- `docs/checkpoints/2026-04-29-admin-dashboard-ux-operational-overview.md`
 - `docs/operations/repository-protection.md`
 - `docs/architecture/repository-structure.md`
 - `context/CHECKPOINT_TECNICO_ATUAL.md`
 
 ## Proxima retomada segura
-1. Reexecutar validacoes finais deste bloco e revisar scanner de secrets.
+1. Executar validacao visual autenticada das telas `/vagas` e `/admin` em desktop/mobile.
 2. Fazer push/PR e validar GitHub Actions remoto.
 3. Configurar branch protection manual da `main`.
 4. Ativar secret scanning/push protection quando disponivel no GitHub.
-5. Confirmar publicacao somente apos protecoes remotas do GitHub.
+5. Capturar screenshots de portfolio com dados sinteticos em `docs/assets/applyflow-vagas.png` e `docs/assets/applyflow-admin-dashboard.png`.
+
+## Atualizacao - CSRF Security Review (2026-04-29)
+
+- Alerta CodeQL revisado: `java/spring-disabled-csrf-protection`.
+- Confirmado refresh token por cookie HttpOnly em login/refresh/logout.
+- `POST /api/v1/auth/refresh` e `POST /api/v1/auth/logout` agora exigem `X-ApplyFlow-CSRF: 1` quando `refresh_token` vier por cookie.
+- `SecurityConfig` deixou de usar `csrf(AbstractHttpConfigurer::disable)`.
+- Frontend envia header CSRF customizado pelo client HTTP compartilhado.
+- Backend tests passaram: `81` testes, `0` falhas, `0` erros, `2` skipped.
+- Frontend build passou.
+- Referencia: `docs/checkpoints/2026-04-29-csrf-security-review.md`.
