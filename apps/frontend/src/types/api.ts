@@ -155,6 +155,68 @@ export type ApplicationTrackingEventResponse = {
   createdAt: string;
 };
 
+export type AdminIngestionOverviewResponse = {
+  providers: AdminProviderOverview[];
+  totals: AdminTotalsOverview;
+  quality: AdminQualityOverview;
+  dedupe: AdminDedupeOverview;
+  recent: AdminRecentOverview;
+};
+
+export type AdminProviderOverview = {
+  sourceConfigId: string;
+  name: string;
+  sourceType: string;
+  tenant: string | null;
+  active: boolean;
+  vacanciesCollected: number;
+  vacanciesPersisted: number;
+  duplicateVacancies: number;
+  averageQualityScore: number;
+  lastExecution: AdminLastExecutionOverview | null;
+};
+
+export type AdminLastExecutionOverview = {
+  status: string;
+  durationMs: number;
+  startedAt: string | null;
+  finishedAt: string | null;
+  fetchedCount: number;
+  persistedCount: number;
+  skippedCount: number;
+  failedCount: number;
+};
+
+export type AdminTotalsOverview = {
+  providers: number;
+  activeProviders: number;
+  vacanciesCollected: number;
+  vacanciesPersisted: number;
+  vacanciesTotal: number;
+  vacanciesVisible: number;
+};
+
+export type AdminQualityOverview = {
+  averageQualityScore: number;
+  topFlags: AdminQualityFlagOverview[];
+};
+
+export type AdminQualityFlagOverview = {
+  flag: string;
+  count: number;
+};
+
+export type AdminDedupeOverview = {
+  totalVacancies: number;
+  duplicateVacancies: number;
+  duplicateRatePercent: number;
+};
+
+export type AdminRecentOverview = {
+  last24h: number;
+  last7d: number;
+};
+
 export type ApiErrorBody = {
   error?: string;
   errorCode?: string;

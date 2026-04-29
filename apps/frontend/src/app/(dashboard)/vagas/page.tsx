@@ -143,64 +143,152 @@ export default function VagasPage() {
     setActionError(null);
   }
 
+  function clearFilters() {
+    setQueryInput("");
+    setQuery("");
+    setWorkModel("all");
+    setSeniority("all");
+    setActionError(null);
+  }
+
+  const hasActiveFilters = queryInput.trim() !== "" || workModel !== "all" || seniority !== "all";
+  const visibleVacanciesCount = sortedVacancies.length;
+  const totalVacanciesCount = vacancies.length;
+
   return (
-    <div className="space-y-4">
-      <header>
-        <h2 className="text-2xl font-bold">Vagas</h2>
-        <p className="text-sm text-slate-600">Priorizacao baseada somente em score, recomendacao e datas retornados pelo backend.</p>
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-1 pb-10 md:px-2">
+      <header className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div className="border-b border-slate-100 bg-[radial-gradient(circle_at_top_left,_rgba(20,184,166,0.16),_transparent_36%),linear-gradient(135deg,_#ffffff,_#f8fafc)] px-5 py-6 md:px-8 md:py-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-teal-700">Dashboard de oportunidades</p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">Vagas</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600 md:text-base">
+              Priorize oportunidades com base no score, recomendacao e dados retornados pelo backend.
+            </p>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-3 text-center sm:grid-cols-3">
+            <MetricPill label="Carregadas" value={String(totalVacanciesCount)} />
+            <MetricPill label="Visíveis" value={String(visibleVacanciesCount)} />
+            <MetricPill label="Ignoradas" value={String(ignoredVacancyIds.size)} />
+          </div>
+        </div>
       </header>
 
-      <section className="grid grid-cols-1 gap-2 md:grid-cols-4">
-        <Input aria-label="Buscar vagas por termo" placeholder="Buscar por termo" value={queryInput} onChange={(e) => setQueryInput(e.target.value)} />
+      <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm md:p-5" aria-labelledby="vagas-filtros-title">
+        <div className="mb-4 flex flex-col gap-1 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h3 id="vagas-filtros-title" className="text-sm font-bold text-slate-900">
+              Busca e filtros
+            </h3>
+            <p className="text-xs text-slate-500">Refine a lista sem alterar o ranking calculado no backend.</p>
+          </div>
+          {hasActiveFilters ? (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-teal-500/20"
+            >
+              Limpar filtros
+            </button>
+          ) : null}
+        </div>
 
-        <select
-          aria-label="Filtrar por modelo de trabalho"
-          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
-          value={workModel}
-          onChange={(e) => setWorkModel(e.target.value as typeof workModel)}
-        >
-          <option value="all">Modelo de trabalho</option>
-          <option value="remote">Remoto</option>
-          <option value="hybrid">Hibrido</option>
-          <option value="onsite">Presencial</option>
-        </select>
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_190px_190px]">
+          <label className="block">
+            <span className="sr-only">Buscar por cargo, empresa ou tecnologia</span>
+            <Input
+              aria-label="Buscar por cargo, empresa ou tecnologia"
+              placeholder="Buscar por cargo, empresa ou tecnologia..."
+              value={queryInput}
+              onChange={(e) => setQueryInput(e.target.value)}
+              className="h-12 rounded-2xl border-slate-200 bg-slate-50 px-4 text-base focus:bg-white"
+            />
+          </label>
 
-        <select
-          aria-label="Filtrar por senioridade"
-          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
-          value={seniority}
-          onChange={(e) => setSeniority(e.target.value as typeof seniority)}
-        >
-          <option value="all">Senioridade</option>
-          <option value="junior">Junior</option>
-          <option value="pleno">Pleno</option>
-          <option value="senior">Senior</option>
-          <option value="especialista">Especialista</option>
-        </select>
+          <label className="block">
+            <span className="sr-only">Modelo de trabalho</span>
+            <select
+              aria-label="Filtrar por modelo de trabalho"
+              className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-700 outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/20"
+              value={workModel}
+              onChange={(e) => setWorkModel(e.target.value as typeof workModel)}
+            >
+              <option value="all">Modelo de trabalho</option>
+              <option value="remote">Remoto</option>
+              <option value="hybrid">Hibrido</option>
+              <option value="onsite">Presencial</option>
+            </select>
+          </label>
+
+          <label className="block">
+            <span className="sr-only">Senioridade</span>
+            <select
+              aria-label="Filtrar por senioridade"
+              className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium text-slate-700 outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/20"
+              value={seniority}
+              onChange={(e) => setSeniority(e.target.value as typeof seniority)}
+            >
+              <option value="all">Senioridade</option>
+              <option value="junior">Junior</option>
+              <option value="pleno">Pleno</option>
+              <option value="senior">Senior</option>
+              <option value="especialista">Especialista</option>
+            </select>
+          </label>
+        </div>
       </section>
 
-      {vacanciesLoading ? <LoadingState label="Carregando vagas..." /> : null}
-      {error ? <ErrorState message={error} /> : null}
+      {error ? <ErrorState message="Não foi possível carregar as vagas agora. Tente novamente ou verifique a disponibilidade do backend." /> : null}
       {actionError ? <ErrorState message={actionError} /> : null}
 
-      {!vacanciesLoading && !error && sortedVacancies.length === 0 ? (
-        <div className="rounded-lg border border-slate-200 bg-white p-6 text-sm text-slate-600">Nenhuma vaga encontrada com os filtros.</div>
-      ) : null}
+      <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm md:p-5" aria-labelledby="vagas-lista-title">
+        <div className="mb-4 flex flex-col gap-1 border-b border-slate-100 pb-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h3 id="vagas-lista-title" className="text-base font-bold text-slate-950">
+              Oportunidades encontradas
+            </h3>
+            <p className="text-sm text-slate-500">
+              {vacanciesLoading
+                ? "Carregando vagas..."
+                : `${visibleVacanciesCount} oportunidade${visibleVacanciesCount === 1 ? "" : "s"} visível${visibleVacanciesCount === 1 ? "" : "eis"}.`}
+            </p>
+          </div>
+        </div>
 
-      <section className="grid grid-cols-1 gap-3">
-        {sortedVacancies.map((vacancy) => (
-          <VacancyListCard
-            key={vacancy.id}
-            vacancy={vacancy}
-            match={matches[vacancy.id]}
-            matchState={matchStates[vacancy.id]}
-            applyState={applyStates[vacancy.id] ?? (applicationsByVacancy[vacancy.id] ? "created" : "idle")}
-            ignored={ignoredVacancyIds.has(vacancy.id)}
-            onApply={(item) => void applyToVacancy(item)}
-            onIgnore={ignoreVacancy}
-          />
-        ))}
+        {vacanciesLoading ? <LoadingState label="Carregando vagas..." /> : null}
+
+        {!vacanciesLoading && !error && sortedVacancies.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+            <p className="text-sm font-semibold text-slate-800">Nenhuma vaga encontrada.</p>
+            <p className="mt-2 text-sm text-slate-600">Ajuste os filtros ou execute uma nova ingestão de vagas.</p>
+          </div>
+        ) : null}
+
+        <div className="grid grid-cols-1 gap-4">
+          {sortedVacancies.map((vacancy) => (
+            <VacancyListCard
+              key={vacancy.id}
+              vacancy={vacancy}
+              match={matches[vacancy.id]}
+              matchState={matchStates[vacancy.id]}
+              applyState={applyStates[vacancy.id] ?? (applicationsByVacancy[vacancy.id] ? "created" : "idle")}
+              ignored={ignoredVacancyIds.has(vacancy.id)}
+              onApply={(item) => void applyToVacancy(item)}
+              onIgnore={ignoreVacancy}
+            />
+          ))}
+        </div>
       </section>
+    </div>
+  );
+}
+
+function MetricPill({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/70 bg-white/75 px-4 py-3 shadow-sm backdrop-blur">
+      <p className="text-2xl font-bold text-slate-950">{value}</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
     </div>
   );
 }

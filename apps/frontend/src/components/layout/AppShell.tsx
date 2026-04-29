@@ -14,6 +14,8 @@ const NAV_ITEMS = [
   { href: "/configuracoes", label: "Configurações" },
 ];
 
+const ADMIN_NAV_ITEM = { href: "/admin", label: "Admin" };
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -35,7 +37,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <nav className="space-y-1">
-            {NAV_ITEMS.map((item) => {
+            {[...NAV_ITEMS, ...(session?.user.role === "ADMIN" ? [ADMIN_NAV_ITEM] : [])].map((item) => {
               const active = pathname === item.href;
               return (
                 <Link
