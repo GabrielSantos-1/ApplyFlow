@@ -1,33 +1,31 @@
 # ApplyFlow
 
+![CI](https://github.com/GabrielSantos-1/ApplyFlow/actions/workflows/ci.yml/badge.svg)
+
 ## Visão Geral
 
 O **ApplyFlow** é uma plataforma orientada a segurança para otimizar o fluxo de candidatura a vagas, combinando ingestão de dados, normalização, matching determinístico e acompanhamento estruturado de candidaturas.
 
-O objetivo não é automatizar decisões críticas com IA, mas **reduzir fricção operacional** no processo de candidatura, mantendo controle, auditabilidade e consistência.
-
----
+O objetivo não é automatizar decisões críticas com IA, mas reduzir fricção operacional no processo de candidatura, mantendo controle, auditabilidade e consistência.
 
 ## Problema
 
-Candidatar-se a vagas manualmente é:
+Candidatar-se a vagas manualmente costuma ser:
 
-- repetitivo
-- desorganizado
-- difícil de rastrear
-- inconsistente entre plataformas
+- repetitivo;
+- desorganizado;
+- difícil de rastrear;
+- inconsistente entre plataformas.
 
 Além disso:
 
-- dados de vagas são heterogêneos
-- não existe padronização de senioridade/localização
-- candidatos perdem tempo com vagas irrelevantes
-
----
+- dados de vagas são heterogêneos;
+- nem sempre há padronização de senioridade, localização e modalidade;
+- candidatos perdem tempo com vagas pouco aderentes.
 
 ## Solução
 
-O ApplyFlow resolve isso com um pipeline estruturado:
+O ApplyFlow estrutura o processo em um pipeline auditável:
 
 ```text
 Ingestão de Vagas
@@ -36,176 +34,246 @@ Ingestão de Vagas
 → Geração de Draft de Candidatura
 → Controle de Status
 → Tracking de Progresso
+```
 
-Sem automação cega.
-Sem scraping agressivo.
-Sem decisões opacas.
+O sistema evita automação cega, scraping agressivo e decisões opacas.
 
-Fluxo Principal
+## Fluxo Principal
+
+```text
 vacancy → match → draft → status → tracking
-Etapas
-Vacancy: vaga ingerida de múltiplas fontes
-Match: cálculo determinístico de compatibilidade
-Draft: criação de candidatura assistida
-Status: transição controlada (DRAFT → APPLIED)
-Tracking: timeline auditável da candidatura
-Arquitetura
+```
+
+Etapas principais:
+
+- **Vacancy**: vaga ingerida de fontes externas.
+- **Match**: cálculo determinístico de compatibilidade.
+- **Draft**: criação de candidatura assistida.
+- **Status**: transição controlada do fluxo de candidatura.
+- **Tracking**: timeline auditável da candidatura.
+
+## Arquitetura
 
 O projeto segue separação clara de responsabilidades:
 
+```text
 apps/
-  backend/     → Spring Boot (API, domínio, segurança)
-  frontend/    → Next.js (interface e consumo de API)
+  backend/      API Spring Boot
+  frontend/     Interface Next.js
+context/        Governança, decisões e estado do projeto
+docs/           Checkpoints, operações e arquitetura
+.github/        CI/CD, workflows e Dependabot
+```
 
-context/       → governança, decisões e estado do projeto
-docs/          → checkpoints, operações, arquitetura
+Princípios adotados:
 
-.github/       → CI/CD, workflows, dependabot
+- arquitetura em camadas;
+- contratos antes da implementação;
+- segurança como requisito estrutural;
+- separação entre autenticação e autorização;
+- logs estruturados com correlation ID;
+- validação server-side em fluxos críticos.
 
-Princípios:
+## Stack Tecnológica
 
-arquitetura em camadas
-contratos antes da implementação
-segurança como requisito estrutural
-separação entre autenticação e autorização
-logs estruturados com correlation ID
-Stack Tecnológica
-Backend
-Java 21
-Spring Boot 3
-Spring Security
-JPA / Hibernate
-PostgreSQL
-Flyway (migrations)
-Redis (rate limit / suporte)
-Frontend
-Next.js (App Router)
-TypeScript
-React
-Infra / DevOps
-Docker / Docker Compose
-GitHub Actions (CI/CD)
-Dependabot
-Segurança
+### Backend
 
-O ApplyFlow foi projetado com mentalidade security-first:
+- Java 21
+- Spring Boot 3
+- Spring Security
+- JPA / Hibernate
+- PostgreSQL
+- Flyway
+- Redis
 
-JWT com controle de claims
-separação entre autenticação e autorização
-RBAC (controle por papel)
-proteção contra IDOR/BOLA via ownership
-validação server-side obrigatória
-rate limiting em endpoints críticos
-logs estruturados (sem dados sensíveis)
-upload de PDF validado
-secrets fora do código
-hygiene de repositório (CI bloqueando vazamentos)
-Validação em Runtime
+### Frontend
 
-O fluxo principal é validado via smoke test automatizado:
+- Next.js
+- React
+- TypeScript
 
+### Infraestrutura e Operação
+
+- Docker / Docker Compose
+- GitHub Actions
+- Dependabot
+- Smoke tests operacionais
+
+## Segurança
+
+O ApplyFlow foi projetado com mentalidade **security-first**.
+
+Controles aplicados:
+
+- autenticação com JWT;
+- refresh token;
+- RBAC;
+- ownership checks para mitigar IDOR/BOLA;
+- validação server-side;
+- rate limiting em endpoints críticos;
+- upload de PDF com validação;
+- logs sem dados sensíveis;
+- secrets fora do código;
+- hygiene gate no CI para bloquear arquivos sensíveis;
+- documentação de segurança em `SECURITY.md`.
+
+## Validação em Runtime
+
+O fluxo principal é validado por smoke test automatizado:
+
+```text
 vacancy → match → draft → status → tracking
+```
 
-Script:
+Scripts principais:
 
+```text
 apps/backend/ops/smoke/run-runtime-smoke.ps1
-
-Modo staging (Docker):
-
 apps/backend/ops/smoke/run-staging-runtime-smoke.ps1
+```
 
 Resultado esperado:
 
+```text
 SMOKE_RUNTIME_RESULT=PASS
-CI/CD
+```
 
-Pipeline com GitHub Actions:
+## CI/CD
 
-backend-test → testes do backend
-frontend-quality → lint + typecheck + build
-repository-hygiene → bloqueio de arquivos sensíveis
+O pipeline do GitHub Actions valida:
 
-Execução automática em:
+- `backend-test`: testes automatizados do backend;
+- `frontend-quality`: lint mínimo, typecheck e build do frontend;
+- `repository-hygiene`: bloqueio de arquivos sensíveis e padrões críticos.
 
-push na main
-pull requests
-Estrutura do Repositório
-.github/        → workflows CI/CD
-apps/backend/   → API Spring Boot
-apps/frontend/  → Next.js frontend
-context/        → governança e estado do projeto
-docs/           → checkpoints e documentação
+O CI roda em:
 
-Não versionado:
+- push na `main`;
+- pull requests para `main`.
 
+## Estrutura do Repositório
+
+```text
+.github/        Workflows CI/CD e Dependabot
+apps/backend/   API Spring Boot
+apps/frontend/  Frontend Next.js
+context/        Estado técnico, decisões e tarefas
+docs/           Checkpoints, operações e documentação técnica
+```
+
+Arquivos que não devem ser versionados:
+
+```text
 .env
-node_modules
-.next
-target
-logs
-dumps
-tokens temporários
-Como Rodar
-Backend
+.env.local
+node_modules/
+.next/
+target/
+logs/
+dumps/
+tmp_*
+*token*.txt
+```
+
+## Como Rodar
+
+### Backend
+
+```powershell
 cd apps/backend
 .\mvnw.cmd -B test -DskipITs
 .\mvnw.cmd spring-boot:run
-Frontend
+```
+
+### Frontend
+
+```bash
 cd apps/frontend
 npm install
 npm run dev
-Variáveis de Ambiente
+```
 
-Utilizar .env.example como referência.
+## Variáveis de Ambiente
 
-Nunca versionar:
+Use os arquivos `.env.example` como referência.
 
-.env
-.env.local
+Arquivos reais de ambiente não devem ser versionados.
 
-Principais variáveis:
+Exemplos de variáveis:
 
+```env
 JWT_SECRET_BASE64=
 ACTUATOR_METRICS_TOKEN=
 DATABASE_URL=
 SMOKE_ADMIN_EMAIL=
 SMOKE_ADMIN_PASSWORD=
-Comandos Úteis
-# Backend
-mvn test
+```
 
-# Frontend
-npm run build
-npm run typecheck
+## Comandos Úteis
+
+### Backend
+
+```powershell
+cd apps/backend
+.\mvnw.cmd -B test -DskipITs
+```
+
+### Frontend
+
+```bash
+cd apps/frontend
 npm run lint
+npm run typecheck
+npm run build
+```
 
-# Smoke runtime
-run-runtime-smoke.ps1
-Estado Atual
-Backend: estável
-Frontend: funcional
-CI/CD: ativo
-Smoke runtime: validado
-Segurança: aplicada
+### Smoke Runtime
 
-Limitações atuais:
+```powershell
+powershell -ExecutionPolicy Bypass -File apps/backend/ops/smoke/run-runtime-smoke.ps1
+```
 
-lint semântico (ESLint) ainda não reintroduzido
-branch protection depende de configuração manual
-smoke remoto depende de secrets no GitHub
-Roadmap
+## Estado Atual
 
-Próximos passos:
+Estado consolidado:
 
-reforço de lint semântico
-melhoria de UX no frontend
-evolução de matching
-possíveis integrações adicionais de vagas
-Aviso de Segurança
-Nunca commitar .env real
-Nunca expor tokens ou credenciais
-Não utilizar dados reais em ambientes de teste
-Reportar vulnerabilidades conforme SECURITY.md
-Licença
+- backend com testes automatizados;
+- frontend com build validado;
+- CI/CD configurado;
+- smoke runtime validado localmente/staging;
+- documentação de segurança criada;
+- repository hygiene ativo no CI.
 
-Ainda não definida.
+Limitações conhecidas:
+
+- lint semântico com ESLint ainda não foi reintroduzido;
+- smoke remoto depende de secrets configurados no GitHub Actions;
+- branch protection depende de configuração manual no GitHub.
+
+## Roadmap
+
+Próximas melhorias planejadas:
+
+- reintroduzir ESLint semântico;
+- melhorar experiência visual do frontend;
+- adicionar screenshots e diagrama visual ao README;
+- evoluir filtros e UX do matching;
+- ampliar integrações de vagas de forma controlada.
+
+## Aviso de Segurança
+
+Nunca versionar:
+
+- `.env` real;
+- tokens;
+- credenciais;
+- dumps;
+- logs sensíveis;
+- currículos reais;
+- dados pessoais.
+
+Vulnerabilidades devem ser reportadas conforme as orientações em `SECURITY.md`.
+
+## Licença
+
+Este projeto está licenciado sob a licença MIT. Consulte o arquivo `LICENSE`.

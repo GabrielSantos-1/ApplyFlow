@@ -2,7 +2,7 @@
 
 ## Estado Atual de Execucao
 
-- Em foco: public release hardening e portfolio polish para possivel exposicao publica.
+- Em foco: correcao final do README, LICENSE MIT e hardening final antes de publicacao.
 - Resultado do bloco (2026-04-29):
   - [x] reescrever README raiz com apresentacao publica do ApplyFlow;
   - [x] criar `SECURITY.md`;
@@ -10,16 +10,20 @@
   - [x] criar `apps/frontend/.env.example`;
   - [x] criar `docs/architecture/repository-structure.md`;
   - [x] criar `CONTRIBUTING.md`;
-  - [x] registrar que LICENSE ainda nao foi decidido;
+  - [x] corrigir README com Markdown valido em portugues pt-BR;
+  - [x] criar `LICENSE` MIT;
+  - [x] atualizar `SECURITY.md` para refletir MIT;
   - [x] reexecutar scanner final de secrets;
   - [x] reexecutar backend tests;
   - [x] reexecutar frontend lint/typecheck/build;
   - [ ] validar GitHub Actions remoto apos push/PR;
   - [ ] configurar branch protection manualmente no GitHub;
   - [ ] ativar secret scanning/push protection quando disponivel;
-  - [ ] decidir LICENSE antes de tornar publico.
+  - [x] decidir LICENSE MIT antes de tornar publico.
 
-## CI/CD & Repository Protection (2026-04-28)- Resultado do bloco (2026-04-28):
+## CI/CD & Repository Protection (2026-04-28)
+
+- Resultado do bloco (2026-04-28):
   - [x] criar `.github/workflows/ci.yml`;
   - [x] criar job `backend-test`;
   - [x] criar job `frontend-quality`;

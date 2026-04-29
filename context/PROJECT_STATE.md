@@ -6,8 +6,8 @@
 |---|---|
 | Projeto | `ApplyFlow / Job Copilot` |
 | Data | `2026-04-29` |
-| Fase | `Public release hardening + portfolio polish` |
-| Status | `README publico, SECURITY.md, CONTRIBUTING.md, env examples e estrutura do repositorio documentados; backend tests e frontend lint/typecheck/build passando; LICENSE, GitHub Actions remoto, branch protection e secret scanning ainda pendentes antes de abertura publica` |
+| Fase | `README + LICENSE public readiness fix` |
+| Status | `README publico, SECURITY.md, CONTRIBUTING.md, env examples e estrutura do repositorio documentados; backend tests e frontend lint/typecheck/build passando; GitHub Actions remoto, branch protection e secret scanning ainda pendentes antes de abertura publica; LICENSE MIT definido` |
 
 ## Estado do produto
 - Fluxo principal validado: `vacancy -> match -> draft -> status -> tracking`.
@@ -23,11 +23,12 @@
 - Smoke runtime operacional versionado em `apps/backend/ops/smoke`.
 - CI principal versionado em `.github/workflows/ci.yml`.
 - Dependabot versionado em `.github/dependabot.yml`.
-- README raiz reescrito para apresentacao publica do ApplyFlow.
+- README raiz corrigido em portugues pt-BR com Markdown valido.
 - `SECURITY.md` criado.
 - `CONTRIBUTING.md` criado.
 - `.env.example` raiz, backend e frontend padronizados sem secrets reais.
 - Estrutura do repositorio documentada em `docs/architecture/repository-structure.md`.
+- `LICENSE` MIT criado.
 
 ## Query-driven ingestion
 - Modelo: `UserJobSearchPreference`.
@@ -62,6 +63,11 @@
 - CI/CD:
   - `backend-test`, `frontend-quality` e `repository-hygiene` criados;
   - CI remoto ainda nao validado no GitHub.
+- Publicacao:
+  - README renderiza corretamente;
+  - LICENSE MIT definido;
+  - `SECURITY.md` alinhado com MIT;
+  - validacoes locais deste bloco passaram.
 
 ## Referencias oficiais
 - `docs/checkpoints/2026-04-24-runtime-validation-flow-consistency.md`
@@ -74,6 +80,7 @@
 - `docs/checkpoints/2026-04-28-runtime-validation-operational-hardening.md`
 - `docs/checkpoints/2026-04-28-ci-cd-repository-protection.md`
 - `docs/checkpoints/2026-04-29-public-release-hardening-portfolio-polish.md`
+- `docs/checkpoints/2026-04-29-readme-license-public-readiness-fix.md`
 - `docs/operations/repository-protection.md`
 - `docs/architecture/repository-structure.md`
 - `context/CHECKPOINT_TECNICO_ATUAL.md`
@@ -83,4 +90,4 @@
 2. Fazer push/PR e validar GitHub Actions remoto.
 3. Configurar branch protection manual da `main`.
 4. Ativar secret scanning/push protection quando disponivel no GitHub.
-5. Definir LICENSE antes de tornar o repositorio publico.
+5. Confirmar publicacao somente apos protecoes remotas do GitHub.

@@ -82,7 +82,7 @@ ApplyFlow currently includes:
 - GitHub secret scanning and push protection depend on repository/account settings and availability.
 - The current frontend `lint` command is a minimal TypeScript gate; semantic ESLint is not yet reintroduced.
 - Runtime smoke requires correctly configured secrets and is manual by design.
-- License has not been selected yet, so public reuse terms are undefined.
+- The project is licensed under the MIT License; see `LICENSE` for reuse terms.
 
 ## Responsible Disclosure
 
