@@ -65,6 +65,7 @@ Classify findings before staging:
 ApplyFlow currently includes:
 
 - JWT authentication with refresh flow.
+- Cookie-backed refresh/logout CSRF hardening with the `X-ApplyFlow-CSRF` header.
 - RBAC for user/admin access boundaries.
 - Ownership checks for user-scoped resources.
 - Rate limiting on sensitive flows.
@@ -83,6 +84,7 @@ ApplyFlow currently includes:
 - The current frontend `lint` command is a minimal TypeScript gate; semantic ESLint is not yet reintroduced.
 - Runtime smoke requires correctly configured secrets and is manual by design.
 - The project is licensed under the MIT License; see `LICENSE` for reuse terms.
+- Spring Security session-based CSRF tokens are not used because the API remains JWT stateless. Cookie-backed refresh/logout endpoints are protected by a dedicated header gate and covered by integration tests.
 
 ## Responsible Disclosure
 

@@ -94,7 +94,7 @@
   - `security.actuator.metrics-token` ausente
 - **Motivo:** evitar operacao com configuracao insegura e falsa sensacao de resiliencia distribuida.
 
-## DECISION-021 - ValidaÃƒÂ§ÃƒÂ£o de carga de staging fora da suite default
+## DECISION-021 - ValidaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o de carga de staging fora da suite default
 - **Data:** `2026-04-20`
 - **Status:** `aceita`
 - **Area:** `qualidade/operacao`
@@ -244,7 +244,7 @@
   - separar leitura e geracao de match:
     - `POST /api/v1/matches` para gerar/regerar;
     - `GET /api/v1/matches/vacancy/{vacancyId}` para leitura stateful;
-  - leitura por vaga retorna estado de dominio (`GENERATED`, `MISSING_RESUME`, `MISSING_VARIANT`, `NOT_GENERATED`) em vez de tratar ausencia de contexto como falha catastrÃƒÂ³fica.
+  - leitura por vaga retorna estado de dominio (`GENERATED`, `MISSING_RESUME`, `MISSING_VARIANT`, `NOT_GENERATED`) em vez de tratar ausencia de contexto como falha catastrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³fica.
 - **Motivo:** remover ambiguidade operacional dos `404` em massa no frontend, preservar auditabilidade do score deterministico e manter ownership por usuario sem vazar match de terceiros.
 
 ## DECISION-042 - Ingestao query-driven por preferencias controladas
@@ -295,3 +295,22 @@
 - **Area:** `repositorio/licenciamento`
 - **Decisao:** licenciar o ApplyFlow sob MIT License, com copyright de 2026 para Gabriel Santos.
 - **Motivo:** permitir reutilizacao publica com termos simples e reconhecidos, removendo o bloqueio de licenca indefinida antes da publicacao.
+## DECISION-049 - UI de vagas como vitrine inicial de portfolio
+- **Data:** `2026-04-29`
+- **Status:** `aceita`
+- **Area:** `frontend/ux/portfolio`
+- **Decisao:** priorizar a tela `/vagas` como primeira vitrine visual do dashboard, mantendo backend, contratos, autenticacao, matching e candidatura inalterados.
+- **Motivo:** o sistema ja estava tecnicamente consolidado; o gargalo para exposicao publica passou a ser clareza visual, hierarquia de informacao e qualidade para screenshots de portfolio.
+## DECISION-050 - Admin overview frontend consome contrato operacional existente
+- **Data:** `2026-04-29`
+- **Status:** `aceita`
+- **Area:** `frontend/admin/operacao`
+- **Decisao:** criar a rota `/admin` consumindo `GET /api/v1/admin/ingestion/overview`, sem alterar backend, DTO backend, RBAC, ingestao ou migrations.
+- **Motivo:** transformar o endpoint operacional ja consolidado em uma interface administravel e apresentavel, mantendo o backend como fonte de verdade e a protecao real por `ROLE_ADMIN`.
+
+## DECISION-051 - CSRF especifico para refresh/logout cookie-backed
+- **Data:** `2026-04-29`
+- **Status:** `aceita`
+- **Area:** `backend/auth/seguranca`
+- **Decisao:** manter a API JWT stateless e proteger `POST /api/v1/auth/refresh` e `POST /api/v1/auth/logout` com header customizado `X-ApplyFlow-CSRF: 1` quando o refresh token vier do cookie HttpOnly `refresh_token`.
+- **Motivo:** o access token continua bearer/stateless e nao depende de cookie automatico, mas refresh/logout aceitam cookie HttpOnly; exigir header customizado bloqueia CSRF via formularios/navegacao cross-site sem mudar DTOs ou contratos publicos.

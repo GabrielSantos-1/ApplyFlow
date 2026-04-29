@@ -29,6 +29,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
   const headers = new Headers();
   headers.set("X-Requested-With", "applyflow-web");
+  headers.set("X-ApplyFlow-CSRF", "1");
   if (body !== undefined && !isFormData) {
     headers.set("Content-Type", "application/json");
   }

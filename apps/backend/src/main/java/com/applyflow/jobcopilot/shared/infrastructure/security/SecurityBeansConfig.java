@@ -58,7 +58,7 @@ public class SecurityBeansConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(resolveAllowedOrigins(properties.getCors().getAllowedOrigins()));
         configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "X-Correlation-Id"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "X-ApplyFlow-CSRF", "X-Correlation-Id"));
         configuration.setExposedHeaders(List.of("X-Correlation-Id", "X-RateLimit-Mode"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
